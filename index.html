@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Asesor de Seguros con Imágenes</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: radial-gradient(circle, #e0e0e0 0%, #b5b5b5 100%);
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 10px;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: #4a4a4a;
+            font-size: 1.8rem;
+            font-weight: 400;
+            text-align: center;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            h1 { font-size: 2.5rem; text-align: left; margin-left: 10%; }
+        }
+
+        /* --- CONTENEDOR CARRUSEL DE AUTOS --- */
+        .slider-container {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            height: 240px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (min-width: 768px) {
+            .slider-container { height: 340px; }
+        }
+
+        .carousel-mask {
+            width: 85%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .carousel-track {
+            display: flex;
+            align-items: center;
+            position: absolute;
+            left: 0;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            will-change: transform;
+        }
+
+        /* Modificado para albergar imágenes de autos */
+        .car-item {
+            width: 220px;
+            height: 140px;
+            background-color: #c5c5c5;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            margin: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
+            opacity: 0.3;
+            transform: scale(0.8);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* Control de la imagen del auto para que no se deforme */
+        .car-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; 
+            pointer-events: none;
+        }
+
+        @media (min-width: 768px) {
+            .car-item { width: 300px; height: 180px; margin: 0 30px; }
+        }
+
+        .car-item.active {
+            opacity: 1;
+            transform: scale(1.1);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+        }
+
+        .car-info {
+            position: absolute;
+            bottom: -15px;
+            font-size: 1.3rem;
+            color: #333;
+            font-weight: 500;
+            text-align: center;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .car-info { font-size: 1.6rem; bottom: 5px; }
+        }
+
+        /* --- SECCIÓN DE ASEGURADORAS --- */
+        .insurance-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .insurance-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Modificado: Quitamos el fondo rojo fijo por si los logos ya traen color o fondo */
+        .insurance-item {
+            width: 140px;
+            height: 50px;
+            background-color: #d32f2f; /* Puedes dejarlo blanco o usar 'transparent' si tus logos son PNG */
+            border: 2px solid #FFFFFF; /* Mantiene la estética de la banda roja del video */
+            border-radius: 8px;
+            margin: 0 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
+            opacity: 0.25;
+            transform: scale(0.8);
+            flex-shrink: 0;
+        }
+
+        /* Control de la imagen del logotipo */
+        .insurance-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        @media (min-width: 768px) {
+            .insurance-item { width: 170px; height: 55px; margin: 0 20px; }
+        }
+
+        .insurance-item.active {
+            opacity: 1;
+            transform: scale(1.15);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            background-color: #FFA1A1;
+        }
+
+        /* --- BOTONES / FLECHAS --- */
+        .arrow {
+            width: 0; 
+            height: 0; 
+            border-top: 14px solid transparent;
+            border-bottom: 14px solid transparent;
+            cursor: pointer;
+            position: absolute;
+            z-index: 10;
+        }
+
+        .arrow-left { left: 5px; border-right: 20px solid #ffffff; }
+        .arrow-right { right: 5px; border-left: 20px solid #ffffff; }
+
+        @media (min-width: 768px) {
+            .arrow-left { left: 15px; border-right-width: 25px; }
+            .arrow-right { right: 15px; border-left-width: 25px; }
+        }
+
+        /* --- MODAL (VENTANA DE COSTOS) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            text-align: center;
+        }
+
+        .modal-overlay.open .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header h2 { color: #333; font-size: 1.6rem; margin-bottom: 5px; }
+        .modal-header p { color: #d32f2f; font-weight: 600; font-size: 1rem; }
+
+        .info-section { background: #f9f9f9; padding: 15px; border-radius: 10px; margin: 15px 0; text-align: left; }
+        .price-box { font-size: 1.8rem; color: #2e7d32; font-weight: 700; text-align: center; margin: 10px 0; }
+
+        .coverage-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            color: #555;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        .coverage-list li:last-child { border-bottom: none; }
+
+        .close-btn {
+            background: #4a4a4a;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Asesor de Seguros</h1>
+
+    <div class="slider-container">
+        <div class="arrow arrow-left" onclick="moveCars(-1)"></div>
+        <div class="carousel-mask" id="cars-mask">
+            <div class="carousel-track" id="cars-track"></div>
+        </div>
+        <div class="arrow arrow-right" onclick="moveCars(1)"></div>
+        <div class="car-info" id="car-name"></div>
+    </div>
+
+    <div class="insurance-section">
+        <div class="insurance-container">
+            <div class="arrow arrow-left" onclick="moveInsurance(-1)"></div>
+            <div class="carousel-mask" id="insurance-mask">
+                <div class="carousel-track" id="insurance-track"></div>
+            </div>
+            <div class="arrow arrow-right" onclick="moveInsurance(1)"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal" onclick="closeModalExterno(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-car-title">Auto</h2>
+                <p id="modal-ins-title">Aseguradora</p>
+            </div>
+            <div class="info-section">
+                <div class="price-box" id="modal-price">$0.00</div>
+                <ul class="coverage-list" id="modal-coverage"></ul>
+            </div>
+            <button class="close-btn" onclick="closeModal()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        // --- AGREGA LAS RUTAS DE TUS IMÁGENES AQUÍ ---
+        const carsData = [
+            { name: "Renault Kwid", baseFactor: 1.0, image: "kwid.png" },
+            { name: "Chevrolet Aveo", baseFactor: 1.2, image: "aveo.png" },
+            { name: "Nissan Versa", baseFactor: 1.4, image: "versa.png" },
+            { name: "VW Jetta", baseFactor: 1.7, image: "jetta.png" }
+        ];
+
+        const insuranceData = [
+            { name: "GNP SEGUROS", baseCost: 650, image: "gnp.png", coverages: ["Daños Materiales (5%)", "Robo Total (10%)", "Responsabilidad Civil ($3M)", "Gastos Médicos ($200K)"] },
+            { name: "AXA SEGUROS", baseCost: 720, image: "axa.png", coverages: ["Daños Materiales (5%)", "Robo Total (5%)", "Responsabilidad Civil ($4M)", "Asistencia Vial Ilimitada"] },
+            { name: "MAPFRE", baseCost: 590, image: "mapfre.png", coverages: ["Daños Materiales (10%)", "Robo Total (10%)", "Responsabilidad Civil ($2.5M)", "Auto Sustituto (10 días)"] },
+            { name: "QUÁLITAS SEGUROS", baseCost: 680, image: "hdi.png", coverages: ["Daños Materiales (5%)", "Robo Total (7%)", "Responsabilidad Civil ($3M)", "Reparación en Agencia"] }
+        ];
+
+        let currentCarIndex = 1;
+        let currentInsIndex = 0;
+
+        function init() {
+            const carTrack = document.getElementById('cars-track');
+            const insTrack = document.getElementById('insurance-track');
+
+            carTrack.innerHTML = '';
+            insTrack.innerHTML = '';
+
+            // Renderizar Autos con etiqueta <img>
+            carsData.forEach((car, index) => {
+                const div = document.createElement('div');
+                div.className = 'car-item';
+                div.innerHTML = `<img src="${car.image}" alt="${car.name}">`;
+                div.onclick = () => { if(index === currentCarIndex) openModal(); };
+                carTrack.appendChild(div);
+            });
+
+            // Renderizar Aseguradoras con etiqueta <img>
+            insuranceData.forEach((ins, index) => {
+                const div = document.createElement('div');
+                div.className = 'insurance-item';
+                div.innerHTML = `<img src="${ins.image}" alt="${ins.name}">`;
+                insTrack.appendChild(div);
+            });
+
+            updateCars();
+            updateInsurance();
+
+            setupSwipe('cars-mask', moveCars);
+            setupSwipe('insurance-mask', moveInsurance);
+
+            window.addEventListener('resize', () => { 
+                updateCars(); 
+                updateInsurance(); 
+            });
+        }
+
+        function updateCars() {
+            const mask = document.getElementById('cars-mask');
+            const track = document.getElementById('cars-track');
+            const items = track.getElementsByClassName('car-item');
+            if(!items.length) return;
+
+            const activeItem = items[currentCarIndex];
+            const centerOfMask = mask.offsetWidth / 2;
+            const itemCenterOffset = activeItem.offsetLeft + (activeItem.offsetWidth / 2);
+            const finalX = centerOfMask - itemCenterOffset;
+            
+            track.style.transform = `translateX(${finalX}px)`;
+
+            for (let i = 0; i < items.length; i++) {
+                items[i].classList.toggle('active', i === currentCarIndex);
+            }
+            document.getElementById('car-name').innerText = carsData[currentCarIndex].name;
+        }
+
+        function moveCars(direction) {
+            currentCarIndex = (currentCarIndex + direction + carsData.length) % carsData.length;
+            updateCars();
+        }
+
+        function updateInsurance() {
+            const mask = document.getElementById('insurance-mask');
+            const track = document.getElementById('insurance-track');
+            const items = track.getElementsByClassName('insurance-item');
+            if(!items.length) return;
+
+            const activeItem = items[currentInsIndex];
+            const centerOfMask = mask.offsetWidth / 2;
+            const itemCenterOffset = activeItem.offsetLeft + (activeItem.offsetWidth / 2);
+            const finalX = centerOfMask - itemCenterOffset;
+            
+            track.style.transform = `translateX(${finalX}px)`;
+
+            for (let i = 0; i < items.length; i++) {
+                items[i].classList.toggle('active', i === currentInsIndex);
+            }
+        }
+
+        function moveInsurance(direction) {
+            currentInsIndex = (currentInsIndex + direction + insuranceData.length) % insuranceData.length;
+            updateInsurance();
+        }
+
+        function setupSwipe(elementId, callback) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            let startX = 0;
+            let endX = 0;
+
+            element.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, {passive: true});
+            element.addEventListener('touchend', (e) => {
+                endX = e.changedTouches[0].clientX;
+                const diff = startX - endX;
+                if (Math.abs(diff) > 35) { 
+                    callback(diff > 0 ? 1 : -1);
+                }
+            }, {passive: true});
+        }
+
+        function openModal() {
+            const car = carsData[currentCarIndex];
+            const insurance = insuranceData[currentInsIndex];
+            const finalPrice = Math.round(insurance.baseCost * car.baseFactor);
+
+            document.getElementById('modal-car-title').innerText = car.name;
+            document.getElementById('modal-ins-title').innerText = insurance.name;
+            document.getElementById('modal-price').innerText = `$${finalPrice} MXN / mes`;
+
+            const coverageList = document.getElementById('modal-coverage');
+            coverageList.innerHTML = '';
+            insurance.coverages.forEach(cov => {
+                const li = document.createElement('li');
+                if(cov.includes('(')) {
+                    const parts = cov.split('(');
+                    li.innerHTML = `<span>${parts[0]}</span><strong style="color:#d32f2f">${parts[1].replace(')','')}</strong>`;
+                } else {
+                    li.innerHTML = `<span>${cov}</span><strong style="color:#2e7d32">Incluido</strong>`;
+                }
+                coverageList.appendChild(li);
+            });
+
+            document.getElementById('modal').classList.add('open');
+        }
+
+        function closeModal() { document.getElementById('modal').classList.remove('open'); }
+        function closeModalExterno(e) { if(e.target.id === 'modal') closeModal(); }
+
+        document.addEventListener("DOMContentLoaded", init);
+    </script>
+</body>
+</html>
